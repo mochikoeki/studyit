@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:studyit/admin/beranda_admin.dart';
+// ignore: unused_import
 import 'package:studyit/pages/beranda.dart';
 import 'pages/kurikulum.dart';
 import 'pages/news.dart';
 import 'pages/menu.dart';
 
 class BasePage extends StatefulWidget {
-  const BasePage({super.key});
+  final bool isAdmin;
+
+  const BasePage({super.key, required this.isAdmin});
 
   @override
   State<BasePage> createState() => _BasePageState();
@@ -17,33 +20,19 @@ class _BasePageState extends State<BasePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeContent(),
-    EventPage(),
-    KurikulumPage(),
-    MenuPage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      _pageController.jumpToPage(index);
-    });
-  }
-
-  void _onPageChanged(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> pages = widget.isAdmin
+        ? [const BerandaAdmin(), const EventPage(), const KurikulumPage(), const MenuPage()]
+        : [const HomeContent(), const EventPage(), const KurikulumPage(), const MenuPage()];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'StudyIt',
-          style: TextStyle(
+          semanticsLabel: widget.isAdmin ? 'Admin Dashboard' : 'User Dashboard',
+          style: const TextStyle(
             color: Colors.green,
             fontFamily: 'Poppins',
             fontSize: 18,
@@ -85,8 +74,10 @@ class _BasePageState extends State<BasePage> {
       ),
       body: PageView(
         controller: _pageController,
-        onPageChanged: _onPageChanged,
-        children: _widgetOptions,
+        children: pages,
+        onPageChanged: (index) {
+          setState(() => _selectedIndex = index);
+        },
       ),
       bottomNavigationBar: Container(
         color: Colors.white,
@@ -107,8 +98,11 @@ class _BasePageState extends State<BasePage> {
               GButton(icon: Icons.book, text: 'Curriculum'),
               GButton(icon: Icons.menu_rounded, text: 'Menu'),
             ],
-            selectedIndex: _selectedIndex, // Menunjukkan halaman yang dipilih
-            onTabChange: _onItemTapped, // Memperbarui indeks saat tab berubah
+            selectedIndex: _selectedIndex,
+            onTabChange: (index) {
+              _pageController.jumpToPage(index);
+              setState(() => _selectedIndex = index);
+            }, // Memperbarui indeks saat tab berubah
           ),
         ),
       ),

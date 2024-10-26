@@ -55,21 +55,33 @@ class LoginPageState extends State<LoginPage> {
     _passwordFocusNode.unfocus();
   }
 
-  void _login() {
-    // Periksa email dan password
-    if (_emailController.text == '' && _passwordController.text == '') {
-      // Jika cocok, navigasi ke halaman Home
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const BasePage ()), // Ganti dengan halaman Home Anda
-      );
-    } else {
-      // Tampilkan pesan kesalahan jika tidak cocok
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
-    }
+  void _login() async {
+  final email = _emailController.text;
+  final password = _passwordController.text;
+
+  // Contoh login sederhana
+  if (email == 'admin' && password == 'admin') {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const BasePage(isAdmin: true),
+      ),
+    );
+  } else if (email == 'user' && password == 'user') {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const BasePage(isAdmin: false),
+      ),
+    );
+  } else {
+    // Tampilkan pesan error jika login gagal
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Login failed. Check your email and password.')),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
