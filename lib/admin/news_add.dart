@@ -48,8 +48,10 @@ class NewsAddState extends State<NewsAdd> {
         backgroundColor: Colors.white,
         title: const Text('Tambah Berita', style: TextStyle(
           fontFamily: "poppins",
-          color: Color.fromARGB(255, 54, 122, 56),
-          fontSize: 20
+            color: Color.fromARGB(255, 93, 174, 96),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.2,
         ),),
         actions: [
           Container(
@@ -122,6 +124,7 @@ class NewsAddState extends State<NewsAdd> {
               ),
             ),
           ],
+
         ),
       ),
     );

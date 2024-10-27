@@ -37,8 +37,10 @@ class NewsEditState extends State<NewsEdit> {
         backgroundColor: Colors.white,
         title: const Text('Edit News', style: TextStyle(
           fontFamily: "poppins",
-          color: Color.fromARGB(255, 54, 122, 56),
-          fontSize: 20
+            color: Color.fromARGB(255, 93, 174, 96),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.2,
         )),
         actions: [
           IconButton(
