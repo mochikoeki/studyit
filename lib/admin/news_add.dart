@@ -27,7 +27,9 @@ class NewsAddState extends State<NewsAdd> {
 
   void _saveArticle() {
     // Logika untuk menyimpan artikel baru, misalnya menambah ke daftar artikel
-    if (_titleController.text.isNotEmpty && _descriptionController.text.isNotEmpty && _image != null) {
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty &&
+        _image != null) {
       // Anda bisa menambahkan logika untuk menyimpan artikel di sini
       Navigator.pop(context); // Kembali ke halaman sebelumnya
     } else {
@@ -41,16 +43,43 @@ class NewsAddState extends State<NewsAdd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Tambah Berita'),
+        backgroundColor: Colors.white,
+        title: const Text('Tambah Berita', style: TextStyle(
+          fontFamily: "poppins",
+          color: Color.fromARGB(255, 54, 122, 56),
+          fontSize: 20
+        ),),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _saveArticle, // Simpan artikel saat ikon disimpan ditekan
+          Container(
+            margin: const EdgeInsets.symmetric(
+                horizontal: 8.0), // Atur margin horizontal
+            padding: const EdgeInsets.all(8.0), // Atur padding dalam ikon
+            decoration: BoxDecoration( 
+              borderRadius:
+                  BorderRadius.circular(8.0), // Menambahkan border radius
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.save,
+                color: Colors.green, // Mengatur warna ikon menjadi putih
+              ),
+              onPressed:
+                  _saveArticle, // Simpan artikel saat ikon disimpan ditekan
+            ),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2.0),
+          child: Container(
+            color: const Color.fromARGB(40, 0, 0, 0),
+            height: 0.7,
+          ),
+        ),
       ),
-      body: SingleChildScrollView( // Membungkus dengan SingleChildScrollView
+      body: SingleChildScrollView(
+        // Membungkus dengan SingleChildScrollView
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
