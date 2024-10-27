@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:studyit/admin/beranda_admin.dart';
+import 'package:studyit/admin/kurikulum_admin.dart';
+import 'package:studyit/admin/news_admin.dart';
 import 'package:studyit/pages/beranda.dart';
 import 'pages/kurikulum.dart';
 import 'pages/news.dart';
@@ -31,8 +33,8 @@ class _BasePageState extends State<BasePage> {
     if (widget.role == "admin") {
       _widgetOptions = <Widget>[
         const BerandaAdmin(),
-        const EventPage(),
-        const KurikulumPage(),
+        const NewsAdmin(),
+        const KurikulumAdmin(),
         const MenuPage(),
       ];
     } else {

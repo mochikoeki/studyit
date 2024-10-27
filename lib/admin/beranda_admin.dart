@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:studyit/model/tugas_model.dart'; // Pastikan model Tugas diimpor
+import 'package:studyit/model/task_page.dart';
 import 'package:studyit/pages/beranda.dart';
-import 'package:studyit/service/firebase_service.dart';
 
 class BerandaAdmin extends StatelessWidget {
   const BerandaAdmin({super.key});
@@ -12,41 +11,36 @@ class BerandaAdmin extends StatelessWidget {
       body: Column(
         children: [
           const Expanded(child: HomeContent()), // Menggunakan HomeContent dari beranda.dart
-          _buildAddQuestionBox(), // Tambahkan box di bawah HomeContent
+          _buildAddQuestionBox(context), // Kirim context ke _buildAddQuestionBox
         ],
       ),
     );
   }
 
-  Widget _buildAddQuestionBox() {
+  // Pastikan context diterima sebagai parameter
+  Widget _buildAddQuestionBox(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FirestoreService().tambah(
-          collectionPath: 'tugas', // Pastikan untuk menyertakan path koleksi
-          item: Tugas(
-            time: '20 m ago',
-            teacher: 'Teacher E',
-            title: 'TASK 4: Title task',
-            description: 'Lorem ipsum dolor sit...',
-      
-          ).toMap(), // Konversi Tugas ke Map
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const TaskListPage()),
         );
       },
       child: Container(
-        margin: const EdgeInsets.all(16.0), // Margin di sekitar box
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0), // Padding di dalam box
+        margin: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
         decoration: BoxDecoration(
-          color: Colors.blueAccent, // Ganti warna sesuai keinginan
-          borderRadius: BorderRadius.circular(8.0), // Sudut membulat
+          color: Colors.blueAccent,
+          borderRadius: BorderRadius.circular(8.0),
         ),
         child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center, // Mengatur posisi konten di dalam row
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: Colors.white), // Ikon "+"
-            SizedBox(width: 8.0), // Jarak antara ikon dan teks
+            Icon(Icons.add, color: Colors.white),
+            SizedBox(width: 8.0),
             Text(
               'Tambahkan Soal',
-              style: TextStyle(color: Colors.white, fontSize: 16.0), // Gaya teks
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
             ),
           ],
         ),
