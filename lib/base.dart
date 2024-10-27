@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-// ignore: unused_import
 import 'package:studyit/admin/beranda_admin.dart';
 import 'package:studyit/pages/beranda.dart';
 import 'pages/kurikulum.dart';
@@ -8,22 +7,43 @@ import 'pages/news.dart';
 import 'pages/menu.dart';
 
 class BasePage extends StatefulWidget {
-  const BasePage({super.key});
+  final String role;
+
+  const BasePage({super.key, String? role}) : role = role ?? 'user';
 
   @override
   State<BasePage> createState() => _BasePageState();
 }
 
+
 class _BasePageState extends State<BasePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    HomeContent(),
-    EventPage(),
-    KurikulumPage(),
-    MenuPage(),
-  ];
+  // Menentukan konten yang sesuai berdasarkan role
+  late List<Widget> _widgetOptions;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Memeriksa role dan menentukan konten yang ditampilkan
+    if (widget.role == "admin") {
+      _widgetOptions = <Widget>[
+        const BerandaAdmin(),
+        const EventPage(),
+        const KurikulumPage(),
+        const MenuPage(),
+      ];
+    } else {
+      _widgetOptions = <Widget>[
+        const HomeContent(),
+        const EventPage(),
+        const KurikulumPage(),
+        const MenuPage(),
+      ];
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -54,13 +74,11 @@ class _BasePageState extends State<BasePage> {
         leading: Padding(
           padding: const EdgeInsets.only(
               top: 16, left: 10, bottom: 12), // Mengatur padding untuk logo
-          child:
-              Image.asset('lib/images/logo.png'), // Ganti dengan path logo Anda
+          child: Image.asset('lib/images/logo.png'), // Ganti dengan path logo Anda
         ),
         actions: [
           IconButton(
-            padding:
-                const EdgeInsets.only(top: 16, right: 16, bottom: 12, left: 14),
+            padding: const EdgeInsets.only(top: 16, right: 16, bottom: 12, left: 14),
             icon: ColorFiltered(
               colorFilter: const ColorFilter.mode(
                 Color.fromARGB(255, 106, 195, 109), // Ganti dengan warna yang Anda inginkan
@@ -100,8 +118,7 @@ class _BasePageState extends State<BasePage> {
             tabBackgroundColor: const Color.fromARGB(255, 106, 195, 109),
             gap: 18,
             padding: const EdgeInsets.all(16),
-            duration: const Duration(
-                milliseconds: 200), // Animasi transisi lebih cepat
+            duration: const Duration(milliseconds: 200), // Animasi transisi lebih cepat
             tabs: const [
               GButton(icon: Icons.home_rounded, text: 'Home'),
               GButton(icon: Icons.ballot_rounded, text: 'News'),
