@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+// ignore: unused_import
 import 'package:studyit/admin/beranda_admin.dart';
 import 'package:studyit/pages/beranda.dart';
 import 'pages/kurikulum.dart';

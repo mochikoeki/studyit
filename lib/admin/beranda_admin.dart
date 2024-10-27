@@ -28,7 +28,7 @@ class BerandaAdmin extends StatelessWidget {
             teacher: 'Teacher E',
             title: 'TASK 4: Title task',
             description: 'Lorem ipsum dolor sit...',
-            gambarUrl: 'defult', // Jika tidak ada, tambahkan default atau kosong
+      
           ).toMap(), // Konversi Tugas ke Map
         );
       },
