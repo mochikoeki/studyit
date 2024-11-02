@@ -17,31 +17,7 @@ class EventPageState extends State<EventPage> {
       'title': 'Poster Event A',
       'description': 'Deskripsi artikel pertama yang berbeda dari yang lain...'
     },
-    {
-      'image': 'lib/images/event1.jpg',
-      'title': 'Poster Event B',
-      'description': 'Detail berita kedua ditampilkan disini...'
-    },
-    {
-      'image': 'lib/images/sampul.jpg',
-      'title': 'Poster Event C',
-      'description': 'Artikel ketiga menjelaskan hal yang berbeda...'
-    },
-    {
-      'image': 'lib/images/sampul2.jpg',
-      'title': 'Poster Event D',
-      'description': 'Artikel ini menampilkan event yang menarik...'
-    },
-    {
-      'image': 'lib/images/artikel.jpg',
-      'title': 'Poster Event C',
-      'description': 'Deskripsi artikel pertama yang berbeda dari yang lain...'
-    },
-    {
-      'image': 'lib/images/artikel.jpg',
-      'title': 'Poster Event Zero',
-      'description': 'Deskripsi artikel pertama yang berbeda dari yang lain...'
-    },
+    
   ];
 
   @override
