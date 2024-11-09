@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:studyit/base.dart';
 import 'package:studyit/pages/create.dart';
@@ -15,29 +17,74 @@ class LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  void _login() {
-    String email = emailController.text;
-    String password = passwordController.text;
+  Future<void> _login() async {
+    try {
+      String email = emailController.text.trim();
+      String password = passwordController.text.trim();
 
-    String? role;
-    if (email == "admin" && password == "a") {
-      role = "admin";
-    } else if (email == "user" && password == "u") {
-      role = "user";
-    } else {
+      // Cek jika email adalah email admin yang ditentukan
+      if (email == 'admin' && password == 'a') {
+        // Admin langsung login dan masuk ke role 'admin'
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BasePage(role: 'admin'),
+          ),
+        );
+      } else {
+        // Jika bukan admin, lakukan autentikasi dengan Firebase
+        UserCredential userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text);
+
+        // Ambil data pengguna dari Firestore
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get();
+
+        if (userDoc.exists) {
+          String role = userDoc['role'] ?? 'user';
+
+          // Jika user ditemukan dan peran adalah user atau lainnya
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BasePage(role: role),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login gagal: data pengguna tidak ditemukan.')),
+          );
+        }
+      }
+    } catch (e) {
+      String errorMessage = 'Login gagal: Terjadi kesalahan';
+
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            errorMessage = 'Email tidak terdaftar';
+            break;
+          case 'wrong-password':
+            errorMessage = 'Password salah';
+            break;
+          case 'invalid-email':
+            errorMessage = 'Email tidak valid';
+            break;
+          case 'invalid-credential':
+            errorMessage = 'Kredensial yang diberikan tidak valid atau rusak';
+            break;
+          default:
+            errorMessage = 'Login gagal: ${e.message}';
+        }
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login gagal. Periksa email dan password.')),
+        SnackBar(content: Text(errorMessage)),
       );
-      return;
     }
-
-    Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (context) => BasePage(role: role), // Melewatkan nilai role yang benar
-  ),
-);
-
   }
 
   void _unfocus() {
@@ -59,11 +106,10 @@ class LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Gambar dan deskripsi di bagian atas
                 _buildHeader(),
-
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 40.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 40.0),
                   child: Column(
                     children: [
                       _buildTextField(
@@ -93,11 +139,7 @@ class LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 20),
                       _buildLoginButton(),
-                      const SizedBox(height: 40),
-                      _buildSocialLoginDivider(),
-                      const SizedBox(height: 30),
-                      _buildSocialLoginButtons(),
-                      const SizedBox(height: 50),
+                      const SizedBox(height: 240),
                       _buildCreateAccountText(),
                     ],
                   ),
@@ -207,7 +249,7 @@ class LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.green,
           shadowColor: Colors.greenAccent.withOpacity(0.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(50.0),
           ),
           elevation: 5,
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -219,77 +261,6 @@ class LoginPageState extends State<LoginPage> {
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialLoginDivider() {
-    return Center(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(width: 80, height: 1, color: Colors.grey[400]),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              'Or login with',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          Container(width: 80, height: 1, color: Colors.grey[400]),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialLoginButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _buildSocialButton(
-          onPressed: () {},
-          assetPath: 'lib/images/google.png',
-          label: 'Google',
-        ),
-        const SizedBox(width: 20),
-        _buildSocialButton(
-          onPressed: () {},
-          assetPath: 'lib/images/fb.png',
-          label: 'Facebook',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSocialButton({
-    required VoidCallback onPressed,
-    required String assetPath,
-    required String label,
-  }) {
-    return SizedBox(
-      width: 140,
-      height: 50,
-      child: OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: Image.asset(assetPath, width: 24, height: 24),
-        label: Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            color: Colors.black,
-            fontSize: 16,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Colors.grey),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
           ),
         ),
       ),

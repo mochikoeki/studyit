@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Tambahkan ini untuk Firebase Authentication
 import 'package:studyit/pages/login.dart';
 
 class CreateAccountPage extends StatefulWidget {
-  // Menghapus const dari sini
   const CreateAccountPage({super.key});
 
   @override
@@ -14,6 +15,12 @@ class CreateAccountPageState extends State<CreateAccountPage> {
   final FocusNode _passwordFocusNode = FocusNode();
   final FocusNode _classFocusNode = FocusNode();
   final FocusNode _studentIdFocusNode = FocusNode();
+
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _classController = TextEditingController();
+  final TextEditingController _studentIdController = TextEditingController();
+
 
   bool _isEmailFocused = false;
   bool _isPasswordFocused = false;
@@ -51,8 +58,53 @@ class CreateAccountPageState extends State<CreateAccountPage> {
     _passwordFocusNode.dispose();
     _classFocusNode.dispose();
     _studentIdFocusNode.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
+
+  Future<void> _createAccount() async {
+  try {
+    // Membuat akun baru dengan Firebase Authentication
+    UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    // Mengambil UID pengguna
+    String userId = userCredential.user!.uid;
+
+    // Menyimpan data tambahan ke Firestore
+    await FirebaseFirestore.instance.collection('users').doc(userId).set({
+      'email': _emailController.text,
+      'class': _classController.text, // Menggunakan controller untuk class
+      'studentId': _studentIdController.text,
+      'role': 'User', // Menggunakan controller untuk studentId
+    });
+
+    // Cek apakah widget masih ada sebelum menggunakan BuildContext
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Account created successfully")),
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+    );
+  } catch (e) {
+    // Cek apakah widget masih ada sebelum menggunakan BuildContext
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Failed to create account: $e")),
+    );
+  }
+}
+
+
+
 
   void _unfocus() {
     _emailFocusNode.unfocus();
@@ -76,7 +128,6 @@ class CreateAccountPageState extends State<CreateAccountPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Gambar di bagian atas
                 SizedBox(
                   width: double.infinity,
                   height: 260,
@@ -148,6 +199,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                           child: TextField(
                             focusNode: _emailFocusNode,
+                            controller: _emailController,
                             decoration: InputDecoration(
                               hintText: _isEmailFocused ? null : 'Email',
                               hintStyle: const TextStyle(
@@ -159,11 +211,8 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                             ),
                             onTap: () {
                               setState(() {
-                                _isEmailFocused = true; // Memperbarui status saat mengetik
+                                _isEmailFocused = true;
                               });
-                            },
-                            onChanged: (value) {
-                              setState(() {});
                             },
                           ),
                         ),
@@ -191,6 +240,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                           child: TextField(
                             focusNode: _passwordFocusNode,
+                            controller: _passwordController,
                             obscureText: true,
                             decoration: InputDecoration(
                               hintText: _isPasswordFocused ? null : 'Password',
@@ -203,11 +253,8 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                             ),
                             onTap: () {
                               setState(() {
-                                _isPasswordFocused = true; // Memperbarui status saat mengetik
+                                _isPasswordFocused = true;
                               });
-                            },
-                            onChanged: (value) {
-                              setState(() {});
                             },
                           ),
                         ),
@@ -215,7 +262,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
 
                       const SizedBox(height: 20),
 
-                      // Kolom class
+                      // Kolom class dan student ID (tetap sama)
                       SizedBox(
                         width: 320,
                         height: 50,
@@ -234,6 +281,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                             ],
                           ),
                           child: TextField(
+                            controller: _classController,
                             focusNode: _classFocusNode,
                             decoration: InputDecoration(
                               hintText: _isClassFocused ? null : 'Class',
@@ -277,6 +325,7 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                             ],
                           ),
                           child: TextField(
+                            controller: _studentIdController,
                             focusNode: _studentIdFocusNode,
                             decoration: InputDecoration(
                               hintText: _isStudentIdFocused ? null : 'Student ID',
@@ -301,14 +350,12 @@ class CreateAccountPageState extends State<CreateAccountPage> {
 
                       const SizedBox(height: 20),
 
-                      // Tombol Create Account
+                      // Tombol Create Account dengan fungsi _createAccount
                       SizedBox(
                         width: 320,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Tambahkan logika untuk membuat akun di sini
-                          },
+                          onPressed: _createAccount,
                           style: ElevatedButton.styleFrom(
                             foregroundColor: const Color.fromARGB(255, 38, 38, 38),
                             backgroundColor: Colors.green,
@@ -336,13 +383,12 @@ class CreateAccountPageState extends State<CreateAccountPage> {
                       // Teks untuk sudah memiliki akun
                       GestureDetector(
                         onTap: () {
-                          // Navigasi ke halaman Login
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const LoginPage(), // Ganti dengan halaman Create Account Anda
+                              builder: (context) => const LoginPage(),
                             ),
-                          ); // Kembali ke halaman login
+                          );
                         },
                         child: RichText(
                           text: const TextSpan(
