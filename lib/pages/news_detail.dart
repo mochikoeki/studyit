@@ -20,8 +20,7 @@ class DetailNewsPage extends StatelessWidget {
         leading: IconButton(
           iconSize: 16,
           icon: const Icon(Icons.arrow_back_ios_new_rounded,
-              color: Color.fromARGB(
-                  255, 106, 195, 109)), // Ganti ikon dan warna di sini
+              color: Color.fromARGB(255, 106, 195, 109)), // Ganti ikon dan warna di sini
           onPressed: () {
             Navigator.pop(context); // Aksi untuk kembali ke halaman sebelumnya
           },
@@ -70,8 +69,10 @@ class DetailNewsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.asset(imagePath, fit: BoxFit.cover),
+            // Menampilkan gambar menggunakan Image.network
+            Image.network(imagePath, fit: BoxFit.cover),
             const SizedBox(height: 16.0),
+            // Menampilkan judul artikel
             Text(
               title,
               style: const TextStyle(
@@ -80,6 +81,7 @@ class DetailNewsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10.0),
+            // Menampilkan deskripsi artikel
             Text(
               description,
               style: const TextStyle(fontSize: 16),

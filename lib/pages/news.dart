@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'news_detail.dart';
 
@@ -11,20 +12,25 @@ class EventPage extends StatefulWidget {
 class EventPageState extends State<EventPage> {
   String selectedFilter = 'All';
 
-  final List<Map<String, String>> articles = [
-    {
-      'image': 'lib/images/artikel.jpg',
-      'title': 'Poster Event A',
-      'description': 'Deskripsi artikel pertama yang berbeda dari yang lain...'
-    },
-    
-  ];
+  // Mengambil data artikel dari Firestore menggunakan StreamBuilder
+  Stream<QuerySnapshot> getArticles() {
+    // Filter artikel berdasarkan kategori (optional)
+    if (selectedFilter == 'All') {
+      return FirebaseFirestore.instance.collection('articles').snapshots();
+    } else {
+      return FirebaseFirestore.instance
+          .collection('articles')
+          .where('category', isEqualTo: selectedFilter.toLowerCase()) // Pastikan cocok dengan kategori Firestore
+          .snapshots();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView( // Wrap with SingleChildScrollView
+      body: SingleChildScrollView(
+        // Wrap with SingleChildScrollView
         padding: const EdgeInsets.all(18.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,8 +51,8 @@ class EventPageState extends State<EventPage> {
                 ),
                 FilterButton(
                   text: 'Article',
-                  isSelected: selectedFilter == 'Article',
-                  onTap: () => setState(() => selectedFilter = 'Article'),
+                  isSelected: selectedFilter == 'Artikel',
+                  onTap: () => setState(() => selectedFilter = 'Artikel'),
                 ),
               ],
             ),
@@ -61,40 +67,60 @@ class EventPageState extends State<EventPage> {
 
             const SizedBox(height: 10),
 
-            // Article/Event Cards (Using GridView for 2 columns per row)
-            GridView.builder(
-  physics: const NeverScrollableScrollPhysics(), // Disable scroll for GridView
-  shrinkWrap: true, // Allow GridView to take only the required space
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2, // 2 items per row
-    crossAxisSpacing: 16.0,
-    mainAxisSpacing: 8.0,
-    childAspectRatio: 0.75, // Adjust the aspect ratio as needed
-  ),
-  itemCount: articles.length,
-  itemBuilder: (context, index) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailNewsPage(
-              imagePath: articles[index]['image']!,
-              title: articles[index]['title']!,
-              description: articles[index]['description']!,
-            ),
-          ),
-        );
-      },
-      child: StackCard(
-        imagePath: articles[index]['image']!,
-        title: articles[index]['title']!,
-        description: articles[index]['description']!,
-      ),
-    );
-  },
-),
+            // Artikel/Event Cards
+            StreamBuilder<QuerySnapshot>(
+              stream: getArticles(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text('Tidak ada artikel.'));
+                }
+
+                final articles = snapshot.data!.docs;
+
+                return GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // 2 items per row
+                    crossAxisSpacing: 16.0,
+                    mainAxisSpacing: 8.0,
+                    childAspectRatio: 0.75,
+                  ),
+                  itemCount: articles.length,
+                  itemBuilder: (context, index) {
+                    final article = articles[index];
+                    final imageUrl = article['image']; // URL gambar
+                    final title = article['title']; // Judul artikel
+                    final description = article['description']; // Deskripsi artikel
+
+                    return GestureDetector(
+                      onTap: () {
+                        // Tambahkan log untuk memastikan URL gambar
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailNewsPage(
+                              imagePath: imageUrl,
+                              title: title,
+                              description: description,
+                            ),
+                          ),
+                        );
+                      },
+                      child: StackCard(
+                        imagePath: imageUrl,
+                        title: title,
+                        description: description,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -122,8 +148,12 @@ class FilterButton extends StatelessWidget {
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: isSelected ? const Color.fromARGB(255, 106, 195, 109) : Colors.white,
-          foregroundColor: isSelected ? Colors.white : const Color.fromARGB(255, 163, 46, 46),
+          backgroundColor: isSelected
+              ? const Color.fromARGB(255, 106, 195, 109)
+              : Colors.white,
+          foregroundColor: isSelected
+              ? Colors.white
+              : const Color.fromARGB(255, 163, 46, 46),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           ),
@@ -161,11 +191,12 @@ class StackCard extends StatelessWidget {
           // Background Image
           ClipRRect(
             borderRadius: BorderRadius.circular(15.0),
-            child: Image.asset(
+            child: Image.network(
               imagePath,
               height: double.infinity, // Fill the height
-              width: double.infinity,   // Fill the width
-              fit: BoxFit.cover,        // Ensure image fills the box and maintains aspect ratio
+              width: double.infinity, // Fill the width
+              fit: BoxFit
+                  .cover, // Ensure image fills the box and maintains aspect ratio
             ),
           ),
           // Gradient overlay
@@ -178,8 +209,8 @@ class StackCard extends StatelessWidget {
                   end: Alignment.topCenter,
                   colors: [
                     Colors.black54,
-                    Color.fromARGB(57, 0, 0, 0),  // Near black at the bottom
-                    Colors.transparent,  // Transparent at the top
+                    Color.fromARGB(57, 0, 0, 0), // Near black at the bottom
+                    Colors.transparent, // Transparent at the top
                   ],
                 ),
               ),

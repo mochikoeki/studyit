@@ -44,6 +44,11 @@ dependencies:
   firebase_storage: ^12.3.3
   timeago: ^3.0.2
   path: ^1.8.3
+  cached_network_image: ^3.4.1
+  flutter_cache_manager: ^3.3.0
+  card_loading: ^0.3.2
+  permission_handler: ^10.2.0
+  logging: ^1.0.2
 
 dev_dependencies:
   flutter_test:

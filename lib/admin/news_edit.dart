@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'news_add.dart'; // Import halaman news_add.dart
+import 'package:studyit/admin/news_add.dart';
 
 class NewsEdit extends StatefulWidget {
   const NewsEdit({super.key});
@@ -9,24 +10,54 @@ class NewsEdit extends StatefulWidget {
 }
 
 class NewsEditState extends State<NewsEdit> {
-  final List<Map<String, String>> articles = [
-    {
-      'image': 'lib/images/artikel.jpg',
-      'title': 'Poster Event A',
-      'description': 'Deskripsi artikel pertama yang berbeda dari yang lain...'
-    },
-    {
-      'image': 'lib/images/event1.jpg',
-      'title': 'Poster Event B',
-      'description': 'Detail berita kedua ditampilkan disini...'
-    },
-  ];
+  // List untuk menyimpan artikel dari Firestore
+  List<Map<String, dynamic>> articles = [];
 
-  void _removeArticle(int index) {
-    // Menghapus artikel berdasarkan index
-    setState(() {
-      articles.removeAt(index);
-    });
+  @override
+  void initState() {
+    super.initState();
+    _fetchArticles(); // Ambil artikel dari Firestore saat halaman pertama kali dibuka
+  }
+
+  // Fungsi untuk mengambil artikel dari Firestore
+  Future<void> _fetchArticles() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('articles').get();
+      if (mounted) { // Cek jika widget masih terpasang
+        setState(() {
+          articles = snapshot.docs.map((doc) {
+            return {
+              'id': doc.id, // Menyimpan ID artikel
+              'image': doc['image'], // Menyimpan URL gambar
+              'title': doc['title'], // Menyimpan judul
+              'description': doc['description'], // Menyimpan deskripsi
+            };
+          }).toList();
+        });
+      }
+    } catch (e) {
+      // Menangani error jika gagal mengambil data
+      if (mounted) { // Cek jika widget masih terpasang
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error fetching articles: $e')));
+      }
+    }
+  }
+
+  // Fungsi untuk menghapus artikel
+  void _removeArticle(String articleId) async {
+    try {
+      await FirebaseFirestore.instance.collection('articles').doc(articleId).delete();
+      if (mounted) { // Cek jika widget masih terpasang
+        setState(() {
+          articles.removeWhere((article) => article['id'] == articleId);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Artikel berhasil dihapus')));
+      }
+    } catch (e) {
+      if (mounted) { // Cek jika widget masih terpasang
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting article: $e')));
+      }
+    }
   }
 
   @override
@@ -37,27 +68,26 @@ class NewsEditState extends State<NewsEdit> {
         backgroundColor: Colors.white,
         title: const Text('Edit News', style: TextStyle(
           fontFamily: "poppins",
-            color: Color.fromARGB(255, 93, 174, 96),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            letterSpacing: -0.2,
+          color: Color.fromARGB(255, 93, 174, 96),
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          letterSpacing: -0.2,
         )),
         actions: [
           IconButton(
             icon: Container(
               margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.only(left: 8), // Menambahkan padding
+              padding: const EdgeInsets.only(left: 8),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0), // Menambahkan border radius
+                borderRadius: BorderRadius.circular(8.0),
               ),
               child: const Icon(
                 Icons.add,
-                color: Colors.green, // Warna ikon
-                size: 30.0, // Ukuran ikon
+                color: Colors.green,
+                size: 30.0,
               ),
             ),
             onPressed: () {
-              // Navigasi ke halaman tambah berita
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const NewsAdd()),
@@ -73,46 +103,48 @@ class NewsEditState extends State<NewsEdit> {
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.only(top: 12),
-        itemCount: articles.length,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            decoration: BoxDecoration(
-              color: Colors.white, // Warna latar belakang Card
-              borderRadius: BorderRadius.circular(8.0), // Menambahkan border radius
-              boxShadow: [
-                BoxShadow(
-                  color: const Color.fromARGB(125, 87, 87, 87).withOpacity(0.1), // Warna bayangan
-                  spreadRadius: 1, // Jarak sebar bayangan
-                  blurRadius: 8, // Tingkat blur bayangan
-                  offset: const Offset(0, 4), // Posisi bayangan di bawah Card
-                ),
-              ],
-            ),
-            child: SizedBox(
-              height: 100, // Mengatur tinggi Card
-              child: Center(
-                child: ListTile(
-                  leading: Image.asset(
-                    articles[index]['image']!,
-                    width: 50,
-                    height: 80,
-                    fit: BoxFit.cover,
+      body: articles.isEmpty
+          ? const Center(child: CircularProgressIndicator()) // Menampilkan loading jika artikel belum diambil
+          : ListView.builder(
+              padding: const EdgeInsets.only(top: 12),
+              itemCount: articles.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(125, 87, 87, 87).withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  title: Text(articles[index]['title']!),
-                  subtitle: Text(articles[index]['description']!),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.green),
-                    onPressed: () => _removeArticle(index), // Menghapus artikel saat tombol ditekan
+                  child: SizedBox(
+                    height: 100,
+                    child: Center(
+                      child: ListTile(
+                        leading: Image.network(
+                          articles[index]['image'], // Menampilkan gambar dari URL
+                          width: 50,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                        title: Text(articles[index]['title']),
+                        subtitle: Text(articles[index]['description']),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.green),
+                          onPressed: () => _removeArticle(articles[index]['id']), // Menghapus artikel
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
     );
   }
 }
