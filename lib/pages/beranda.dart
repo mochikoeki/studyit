@@ -10,12 +10,14 @@ class Task {
   final String teacher;
   final String title;
   final String description;
+  final String url;
 
   Task({
     required this.time,
     required this.teacher,
     required this.title,
     required this.description,
+    required this.url,
   });
 
   // Membuat instance Task dari dokumen Firestore
@@ -25,6 +27,7 @@ class Task {
       teacher: data['teacher'] ?? '',
       title: data['title'] ?? '',
       description: data['description'] ?? '',
+      url: data['url'] ?? '',
     );
   }
 }
