@@ -28,10 +28,54 @@ class TaskListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Daftar Tugas"),
+        leading: IconButton(
+          iconSize: 16,
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              color: Color.fromARGB(255, 106, 195, 109)),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        centerTitle: false,
+        actions: const [
+          Spacer(),
+          Padding(
+            padding: EdgeInsets.only(right: 20.0),
+            child: Row(
+              children: [
+                Text(
+                  'Daftar Tugas',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 80, 146, 83),
+                  ),
+                ),
+                SizedBox(width: 8),
+                Icon(
+                  Icons.task,
+                  size: 18,
+                  color: Color.fromARGB(255, 80, 146, 83),
+                ),
+              ],
+            ),
+          ),
+        ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1.0),
+          child: Container(
+            color: const Color.fromARGB(39, 0, 0, 0),
+            height: 1.0,
+          ),
+        ),
       ),
       body: Stack(
+        
         children: [
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
@@ -55,21 +99,26 @@ class TaskListPage extends StatelessWidget {
                   final taskId = tugasList[index].id;
 
                   return Container(
+                    padding: const EdgeInsets.only(top: 20, bottom: 20, right: 0, left: 12),
                     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
+                          color: const Color.fromARGB(208, 205, 204, 204).withOpacity(0.3),
                           spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
                     child: ListTile(
-                      title: Text(data['title'] ?? 'Judul tidak tersedia'),
+                      title: Text(data['title'] ?? 'Judul tidak tersedia', style: const TextStyle(
+                        fontFamily: "poppins",
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 114, 114, 114)
+                      ),),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -98,6 +147,7 @@ class TaskListPage extends StatelessWidget {
             },
           ),
           Positioned(
+          
             bottom: 70,
             right: 30,
             child: FloatingActionButton(

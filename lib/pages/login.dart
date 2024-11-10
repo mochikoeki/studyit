@@ -18,74 +18,74 @@ class LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> _login() async {
-    try {
-      String email = emailController.text.trim();
-      String password = passwordController.text.trim();
+  try {
+    String email = emailController.text.trim();
+    String password = passwordController.text.trim();
 
-      // Cek jika email adalah email admin yang ditentukan
-      if (email == 'admin' && password == 'a') {
-        // Admin langsung login dan masuk ke role 'admin'
+    if (email == 'admin' && password == 'a') {
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const BasePage(role: 'admin'),
+        ),
+      );
+    } else {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: emailController.text, password: passwordController.text);
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
+      if (userDoc.exists) {
+        String role = userDoc['role'] ?? 'user';
+
+        if (!mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const BasePage(role: 'admin'),
+            builder: (context) => BasePage(role: role),
           ),
         );
       } else {
-        // Jika bukan admin, lakukan autentikasi dengan Firebase
-        UserCredential userCredential = await FirebaseAuth.instance
-            .signInWithEmailAndPassword(
-                email: emailController.text, password: passwordController.text);
-
-        // Ambil data pengguna dari Firestore
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .get();
-
-        if (userDoc.exists) {
-          String role = userDoc['role'] ?? 'user';
-
-          // Jika user ditemukan dan peran adalah user atau lainnya
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BasePage(role: role),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login gagal: data pengguna tidak ditemukan.')),
-          );
-        }
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login gagal: data pengguna tidak ditemukan.')),
+        );
       }
-    } catch (e) {
-      String errorMessage = 'Login gagal: Terjadi kesalahan';
-
-      if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'Email tidak terdaftar';
-            break;
-          case 'wrong-password':
-            errorMessage = 'Password salah';
-            break;
-          case 'invalid-email':
-            errorMessage = 'Email tidak valid';
-            break;
-          case 'invalid-credential':
-            errorMessage = 'Kredensial yang diberikan tidak valid atau rusak';
-            break;
-          default:
-            errorMessage = 'Login gagal: ${e.message}';
-        }
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
     }
+  } catch (e) {
+    String errorMessage = 'Login gagal: Terjadi kesalahan';
+
+    if (e is FirebaseAuthException) {
+      switch (e.code) {
+        case 'user-not-found':
+          errorMessage = 'Email tidak terdaftar';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Password salah';
+          break;
+        case 'invalid-email':
+          errorMessage = 'Email tidak valid';
+          break;
+        case 'invalid-credential':
+          errorMessage = 'Kredensial yang diberikan tidak valid atau rusak';
+          break;
+        default:
+          errorMessage = 'Login gagal: ${e.message}';
+      }
+    }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)),
+    );
   }
+}
+
 
   void _unfocus() {
     FocusScope.of(context).unfocus();
