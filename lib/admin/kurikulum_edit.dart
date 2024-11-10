@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'kurikulum_edit_detail.dart'; // Import file kurikulum_edit_detail.dart
+import 'package:studyit/admin/kurikulum_edit_detail.dart';
 
 class KurikulumEditPage extends StatelessWidget {
   const KurikulumEditPage({super.key});

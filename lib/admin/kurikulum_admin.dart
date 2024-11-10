@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:studyit/pages/kurikulum.dart';
 import 'package:studyit/admin/kurikulum_edit.dart';
+import 'package:studyit/pages/kurikulum.dart';
+
 
 class KurikulumAdmin extends StatelessWidget {
   const KurikulumAdmin({super.key});
