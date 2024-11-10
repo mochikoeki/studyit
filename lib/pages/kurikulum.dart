@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'kurikulum_detail.dart'; // Import halaman detail
 import 'kurmer.dart';
@@ -9,51 +10,81 @@ class KurikulumPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: ListView(
-        padding: const EdgeInsets.only(top: 30.0, right: 20, left: 20, bottom: 10),
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const KurikulumDetailPage(kelas: '7'),
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection('kurikulum').doc('kelas_deskripsi').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text('Terjadi kesalahan saat memuat data.'));
+          }
+
+          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+            return const Center(child: Text('Data tidak ditemukan.'));
+          }
+
+          var data = snapshot.data!;
+          String kelas7Description = data['kelas_7'] ?? 'Deskripsi untuk Kelas 7';
+          String kelas8Description = data['kelas_8'] ?? 'Deskripsi untuk Kelas 8';
+          String kelas9Description = data['kelas_9'] ?? 'Deskripsi untuk Kelas 9';
+
+          return ListView(
+            padding: const EdgeInsets.only(top: 30.0, right: 20, left: 20, bottom: 10),
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => KurikulumDetailPage(
+                      kelas: '7',
+                      description: kelas7Description,
+                    ),
+                  ),
+                ),
+                child: _buildKurikulumBox('Kelas 7', kelas7Description, Icons.book),
               ),
-            ),
-            child: _buildKurikulumBox('Kelas 7', 'Deskripsi untuk Kelas 7', Icons.book),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const KurikulumDetailPage(kelas: '8'),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => KurikulumDetailPage(
+                      kelas: '8',
+                      description: kelas8Description,
+                    ),
+                  ),
+                ),
+                child: _buildKurikulumBox('Kelas 8', kelas8Description, Icons.book),
               ),
-            ),
-            child: _buildKurikulumBox('Kelas 8', 'Deskripsi untuk Kelas 8', Icons.book),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const KurikulumDetailPage(kelas: '9'),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => KurikulumDetailPage(
+                      kelas: '9',
+                      description: kelas9Description,
+                    ),
+                  ),
+                ),
+                child: _buildKurikulumBox('Kelas 9', kelas9Description, Icons.book),
               ),
-            ),
-            child: _buildKurikulumBox('Kelas 9', 'Deskripsi untuk Kelas 9', Icons.book),
-          ),
-          const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const KurmerPage()),
-            ),
-            child: _buildKurikulumBox2('Apa itu Kurikulum Merdeka?', 'Penjelasan tentang Kurikulum Merdeka', Icons.info),
-          ),
-        ],
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const KurmerPage()),
+                ),
+                child: _buildKurikulumBox2('Apa itu Kurikulum Merdeka?', 'Penjelasan tentang Kurikulum Merdeka', Icons.info),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
-
 
   // Widget untuk box kurikulum biasa
   Widget _buildKurikulumBox(String title, String description, IconData icon) {

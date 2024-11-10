@@ -1,8 +1,21 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:studyit/admin/kurikulum_edit_detail.dart';
 
 class KurikulumEditPage extends StatelessWidget {
   const KurikulumEditPage({super.key});
+
+  Future<void> _addInitialData() async {
+    try {
+      // Menambahkan dokumen baru dengan field deskripsi untuk kelas 7, 8, dan 9
+      await FirebaseFirestore.instance.collection('kurikulum').doc('kelas_deskripsi').set({
+        'kelas_7': 'Deskripsi untuk Kelas 7',
+        'kelas_8': 'Deskripsi untuk Kelas 8',
+        'kelas_9': 'Deskripsi untuk Kelas 9',
+      });
+    } catch (e) {
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +41,37 @@ class KurikulumEditPage extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildKurikulumTile(context, 'Kelas 7', 'Deskripsi untuk Kelas 7'),
-          _buildKurikulumTile(context, 'Kelas 8', 'Deskripsi untuk Kelas 8'),
-          _buildKurikulumTile(context, 'Kelas 9', 'Deskripsi untuk Kelas 9'),
-        ],
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection('kurikulum').doc('kelas_deskripsi').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return const Center(child: Text('Terjadi kesalahan'));
+          }
+
+          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+            // Jika data tidak ditemukan, tambahkan data default
+            _addInitialData();
+            return const Center(child: Text('Data sedang ditambahkan...'));
+          }
+
+          var data = snapshot.data!;
+          String kelas7Description = data['kelas_7'] ?? 'Deskripsi untuk Kelas 7';
+          String kelas8Description = data['kelas_8'] ?? 'Deskripsi untuk Kelas 8';
+          String kelas9Description = data['kelas_9'] ?? 'Deskripsi untuk Kelas 9';
+
+          return ListView(
+            padding: const EdgeInsets.all(16.0),
+            children: [
+              _buildKurikulumTile(context, 'Kelas 7', kelas7Description),
+              _buildKurikulumTile(context, 'Kelas 8', kelas8Description),
+              _buildKurikulumTile(context, 'Kelas 9', kelas9Description),
+            ],
+          );
+        },
       ),
     );
   }

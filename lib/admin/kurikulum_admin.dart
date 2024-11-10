@@ -21,7 +21,7 @@ class KurikulumAdmin extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          const KurikulumEditPage()), // Ganti dengan halaman edit
+                          KurikulumEditPage()), // Ganti dengan halaman edit
                 );
               },
               backgroundColor: const Color.fromARGB(

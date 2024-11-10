@@ -2,14 +2,20 @@ import 'package:flutter/material.dart';
 
 class KurikulumDetailPage extends StatelessWidget {
   final String kelas;
+  final String description; // Menambahkan parameter description
 
-  const KurikulumDetailPage({super.key, required this.kelas});
+  // Konstruktor menerima kelas dan description
+  const KurikulumDetailPage({
+    super.key,
+    required this.kelas,
+    required this.description, // Menambahkan parameter description
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detail Kurikulum $kelas'),
+        title: Text('Detail Kurikulum - Kelas $kelas'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -25,10 +31,15 @@ class KurikulumDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'Detail lengkap untuk Kurikulum $kelas.',
-              style: const TextStyle(fontSize: 16),
+              description, // Menampilkan deskripsi yang diterima
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
             ),
+            const SizedBox(height: 16),
             // Tambahkan informasi detail kurikulum sesuai kelas di sini
+            // Misalnya, Anda bisa menambahkan informasi lain yang relevan
           ],
         ),
       ),
