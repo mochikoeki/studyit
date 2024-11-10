@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'kurikulum_edit_detail.dart'; // Import file kurikulum_edit_detail.dart
 
 class KurikulumEditPage extends StatelessWidget {
   const KurikulumEditPage({super.key});
@@ -16,7 +17,7 @@ class KurikulumEditPage extends StatelessWidget {
             color: Color.fromARGB(255, 93, 174, 96),
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            letterSpacing: -0.2, // Mengatur jarak antar huruf
+            letterSpacing: -0.2,
           ),
         ),
         bottom: PreferredSize(
@@ -33,7 +34,6 @@ class KurikulumEditPage extends StatelessWidget {
           _buildKurikulumTile(context, 'Kelas 7', 'Deskripsi untuk Kelas 7'),
           _buildKurikulumTile(context, 'Kelas 8', 'Deskripsi untuk Kelas 8'),
           _buildKurikulumTile(context, 'Kelas 9', 'Deskripsi untuk Kelas 9'),
-          // Tambahkan lebih banyak kurikulum sesuai kebutuhan
         ],
       ),
     );
@@ -44,28 +44,26 @@ class KurikulumEditPage extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
-        color: Colors.white, // Set warna latar belakang menjadi putih
-        borderRadius:
-            BorderRadius.circular(10.0), // Radius untuk sudut yang halus
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2), // Warna shadow
-            spreadRadius: 2, // Jarak penyebaran shadow
-            blurRadius: 6, // Radius blur shadow
-            offset: const Offset(0, 4), // Posisi shadow
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 6,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: SizedBox(
-        height: 100, // Menentukan tinggi box
+        height: 100,
         child: Center(
-          // Memastikan item di dalam box rata tengah secara vertikal
           child: ListTile(
             title: Text(
               title,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 97, 97, 97), // Menebalkan judul
+                color: Color.fromARGB(255, 97, 97, 97),
               ),
             ),
             subtitle: Text(description),
@@ -73,7 +71,6 @@ class KurikulumEditPage extends StatelessWidget {
               icon: const Icon(Icons.edit,
                   color: Color.fromARGB(255, 96, 183, 99)),
               onPressed: () {
-                // Arahkan ke halaman detail edit kurikulum
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -84,50 +81,6 @@ class KurikulumEditPage extends StatelessWidget {
               },
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class EditKurikulumDetailPage extends StatelessWidget {
-  final String title;
-  final String description;
-
-  const EditKurikulumDetailPage(
-      {super.key, required this.title, required this.description});
-
-  @override
-  Widget build(BuildContext context) {
-    final titleController = TextEditingController(text: title);
-    final descriptionController = TextEditingController(text: description);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Detail Kurikulum'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Judul Kurikulum'),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(labelText: 'Deskripsi'),
-              maxLines: 5,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Simpan Perubahan'),
-            ),
-          ],
         ),
       ),
     );

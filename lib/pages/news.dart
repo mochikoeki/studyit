@@ -20,7 +20,9 @@ class EventPageState extends State<EventPage> {
     } else {
       return FirebaseFirestore.instance
           .collection('articles')
-          .where('category', isEqualTo: selectedFilter.toLowerCase()) // Pastikan cocok dengan kategori Firestore
+          .where('category',
+              isEqualTo: selectedFilter
+                  .toLowerCase()) // Pastikan cocok dengan kategori Firestore
           .snapshots();
     }
   }
@@ -56,17 +58,13 @@ class EventPageState extends State<EventPage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 10),
-
             // Page Title
             const Text(
               'Artikel',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 10),
-
             // Artikel/Event Cards
             StreamBuilder<QuerySnapshot>(
               stream: getArticles(),
@@ -95,7 +93,8 @@ class EventPageState extends State<EventPage> {
                     final article = articles[index];
                     final imageUrl = article['image']; // URL gambar
                     final title = article['title']; // Judul artikel
-                    final description = article['description']; // Deskripsi artikel
+                    final description =
+                        article['description']; // Deskripsi artikel
 
                     return GestureDetector(
                       onTap: () {
@@ -165,7 +164,6 @@ class FilterButton extends StatelessWidget {
   }
 }
 
-// StackCard widget to allow flexibility with image and text overlay
 class StackCard extends StatelessWidget {
   final String imagePath;
   final String title;
@@ -177,6 +175,14 @@ class StackCard extends StatelessWidget {
     required this.description,
     super.key,
   });
+
+  String getShortDescription(String description) {
+    List<String> words = description.split(' ');
+    if (words.length > 4) {
+      return '${words.sublist(0, 4).join(' ')}...';
+    }
+    return description;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,10 +199,9 @@ class StackCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(15.0),
             child: Image.network(
               imagePath,
-              height: double.infinity, // Fill the height
-              width: double.infinity, // Fill the width
-              fit: BoxFit
-                  .cover, // Ensure image fills the box and maintains aspect ratio
+              height: double.infinity,
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
           ),
           // Gradient overlay
@@ -209,8 +214,8 @@ class StackCard extends StatelessWidget {
                   end: Alignment.topCenter,
                   colors: [
                     Colors.black54,
-                    Color.fromARGB(57, 0, 0, 0), // Near black at the bottom
-                    Colors.transparent, // Transparent at the top
+                    Color.fromARGB(57, 0, 0, 0),
+                    Colors.transparent,
                   ],
                 ),
               ),
@@ -234,7 +239,7 @@ class StackCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  description,
+                  getShortDescription(description),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
