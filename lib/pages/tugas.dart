@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Untuk menggunakan clipboard
+import 'package:url_launcher/url_launcher.dart'; // Tambahkan ini untuk membuka URL di browser
 import 'package:studyit/pages/beranda.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -15,21 +15,22 @@ class TugasPage extends StatelessWidget {
     this.padding = const EdgeInsets.all(16.0), // Nilai default untuk padding
   });
 
-  // Fungsi untuk menyalin URL ke clipboard dengan BuildContext sebagai parameter
-  void _copyToClipboard(BuildContext context, String url) async {
-    await Clipboard.setData(ClipboardData(text: url));
-
-    // Periksa apakah widget masih terpasang (mounted) sebelum menampilkan SnackBar
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('URL berhasil disalin ke clipboard!')),
-      );
+  void _openLinkInBrowser(String url) async {
+  Uri uri = Uri.parse(url);
+  if (uri.scheme == 'http' || uri.scheme == 'https') {
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      throw 'Could not launch $url: $e';
     }
+  } else {
+    throw 'Invalid URL scheme: $url';
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
-    // Mengonversi waktu menjadi format relatif (seperti "1 hour ago")
     String formattedTime = timeago.format(DateTime.parse(task.time));
 
     return Scaffold(
@@ -81,12 +82,12 @@ class TugasPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Membungkus konten agar dapat digulir
+        child: SingleChildScrollView(
           child: Container(
-            width: boxWidth, // Menggunakan boxWidth yang dapat diubah
+            width: boxWidth,
             decoration: BoxDecoration(
-              color: Colors.white, // Background putih untuk box
-              borderRadius: BorderRadius.circular(16), // Rounded corners
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
                   color: const Color.fromARGB(212, 171, 171, 171).withOpacity(0.3),
@@ -96,88 +97,79 @@ class TugasPage extends StatelessWidget {
                 ),
               ],
             ),
-            padding: padding, // Menggunakan padding yang dapat diubah
+            padding: padding,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Box abu-abu untuk By: Teacher dan waktu relatif
                 Container(
                   padding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 16.0),
                   decoration: BoxDecoration(
-                    color: Colors.grey[200], // Warna latar belakang abu-abu
-                    borderRadius: BorderRadius.circular(8), // Rounded corners
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Nama guru di kiri
                       Text(
                         'By: ${task.teacher}',
                         style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
-                      // Waktu relatif di kanan
                       Text(
-                        formattedTime, // Menampilkan waktu relatif
+                        formattedTime,
                         style: const TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Judul tugas di tengah, tebal
                 Text(
                   task.title,
                   style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-
-                // Deskripsi tugas
                 Text(
-                  task.description, // Menampilkan deskripsi tugas
+                  task.description,
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black,
-                    height: 1.5, // Memberikan jarak antar baris untuk deskripsi
+                    height: 1.5,
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Menampilkan URL yang diambil dari Firestore
                 Text(
-                  task.url, // Menampilkan URL
+                  task.url,
                   style: const TextStyle(
                     color: Colors.blue,
                     fontSize: 16,
-                    decoration: TextDecoration.underline, // Garis bawah pada URL
+                    decoration: TextDecoration.underline,
                   ),
                 ),
                 const SizedBox(height: 20),
 
-                // Button "Copy Link" untuk menyalin URL ke clipboard
+                // Tombol "View" untuk membuka URL di browser
                 ElevatedButton(
                   onPressed: () {
-                    _copyToClipboard(context, task.url);
+                    _openLinkInBrowser(task.url);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green, // Set button color to green
-                    elevation: 0, // Remove shadow
+                    backgroundColor: Colors.green,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(30), // Keep rounded corners
+                          BorderRadius.circular(30),
                     ),
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12), // Vertical padding
+                        vertical: 12),
                     minimumSize: const Size(double.infinity,
-                        50), // Full width button with fixed height
+                        50),
                   ),
                   child: const Text(
-                    'Copy Link',
+                    'View',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white, // Set text color to white
+                      color: Colors.white,
                     ),
                   ),
                 ),

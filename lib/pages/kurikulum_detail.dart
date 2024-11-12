@@ -19,28 +19,30 @@ class KurikulumDetailPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Kurikulum $kelas',
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+        child: SingleChildScrollView( // Membuat halaman scrollable
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Kurikulum $kelas',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              description, // Menampilkan deskripsi yang diterima
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
+              const SizedBox(height: 16),
+              Text(
+                description, // Menampilkan deskripsi yang diterima
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Color.fromARGB(255, 94, 94, 94),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            // Tambahkan informasi detail kurikulum sesuai kelas di sini
-            // Misalnya, Anda bisa menambahkan informasi lain yang relevan
-          ],
+              const SizedBox(height: 16),
+              // Tambahkan informasi detail kurikulum sesuai kelas di sini
+              // Misalnya, Anda bisa menambahkan informasi lain yang relevan
+            ],
+          ),
         ),
       ),
     );

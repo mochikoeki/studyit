@@ -86,8 +86,10 @@ class KurikulumPage extends StatelessWidget {
     );
   }
 
-  // Widget untuk box kurikulum biasa
+  // Widget untuk box kurikulum biasa dengan pemotongan teks
   Widget _buildKurikulumBox(String title, String description, IconData icon) {
+    String truncatedDescription = description.length > 50 ? '${description.substring(0, 17)}...' : description;
+
     return Container(
       padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
@@ -119,7 +121,7 @@ class KurikulumPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 8), // Space between title and description
                 Text(
-                  description,
+                  truncatedDescription, // Tampilkan deskripsi yang sudah dipotong
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,

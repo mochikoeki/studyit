@@ -49,6 +49,7 @@ dependencies:
   card_loading: ^0.3.2
   permission_handler: ^10.2.0
   logging: ^1.0.2
+  flutter_quill: ^10.8.5
 
 dev_dependencies:
   flutter_test:

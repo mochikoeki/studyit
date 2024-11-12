@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'login.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -209,9 +210,22 @@ class MenuPageState extends State<MenuPage> {
                 const SizedBox(height: 10),
                 _buildFeatureButton(Icons.account_circle_rounded, '   Teacher List'),
                 const SizedBox(height: 10),
-                _buildFeatureButton(Icons.help_center_rounded, '   FAQ'),
-                const SizedBox(height: 10),
                 _buildFeatureButton(Icons.info, '   About'),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    // Arahkan ke halaman login
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginPage()),
+                    );
+                  },
+                  child: _buildFeatureButton(
+                    Icons.logout_outlined,
+                    '   Logout',
+                    const Color.fromARGB(255, 148, 82, 78),
+                  ),
+                ), // Tombol Logout dengan ikon merah
               ],
             ),
           ],
@@ -278,58 +292,50 @@ class MenuPageState extends State<MenuPage> {
               color: Color.fromARGB(255, 103, 103, 103),
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Poppins', // Use Poppins font
+              fontFamily: 'Poppins',
             ),
-          ),
-          Icon(
-            Icons.arrow_forward,
-            color: Color.fromARGB(
-                255, 109, 109, 109), // Ganti dengan warna yang diinginkan
           ),
         ],
       ),
     );
   }
 
-  // Function for the feature buttons
-  Widget _buildFeatureButton(IconData icon, String label) {
-  return Container(
-    width: double.infinity, // Agar tombol mengisi lebar
-    height: 50, // Tinggi tombol
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      boxShadow: [
-        BoxShadow(
-          color: const Color.fromARGB(255, 194, 194, 194).withOpacity(0.2),
-          spreadRadius: 2,
-          blurRadius: 3,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Padding( // Tambahkan Padding di sini
-      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Sesuaikan nilai padding
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Icon(icon,
-              size: 20,
-              color: const Color.fromARGB(255, 106, 195, 109)), // Ikon tombol
-          const SizedBox(width: 10), // Jarak antara ikon dan teks
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color.fromARGB(255, 143, 143, 143),
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Poppins', // Use Poppins font
-            ),
+  // Function for feature buttons with an optional icon color
+  Widget _buildFeatureButton(IconData icon, String label, [Color iconColor = const Color.fromARGB(255, 106, 195, 109)]) {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 194, 194, 194).withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-    ),
-  );
-}
-
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Icon(icon, size: 20, color: iconColor),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Color.fromARGB(255, 143, 143, 143),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

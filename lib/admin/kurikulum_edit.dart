@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:studyit/admin/kurikulum_edit_detail.dart';
+import 'package:logging/logging.dart'; // Import package logging
 
 class KurikulumEditPage extends StatelessWidget {
-  const KurikulumEditPage({super.key});
+  // Menghapus 'const' karena logger tidak bisa diinisialisasi dengan 'const'
+  KurikulumEditPage({super.key});
+
+  // Membuat instance logger
+  final Logger _logger = Logger('KurikulumEditPage');
 
   Future<void> _addInitialData() async {
     try {
@@ -13,7 +18,12 @@ class KurikulumEditPage extends StatelessWidget {
         'kelas_8': 'Deskripsi untuk Kelas 8',
         'kelas_9': 'Deskripsi untuk Kelas 9',
       });
+
+      // Log untuk memastikan data ditambahkan
+      _logger.info('Data berhasil ditambahkan ke Firestore');
     } catch (e) {
+      // Log error jika gagal menambahkan data
+      _logger.severe('Gagal menambahkan data: $e');
     }
   }
 
@@ -76,8 +86,9 @@ class KurikulumEditPage extends StatelessWidget {
     );
   }
 
-  Widget _buildKurikulumTile(
-      BuildContext context, String title, String description) {
+  Widget _buildKurikulumTile(BuildContext context, String title, String description) {
+    String shortDescription = description.length > 18 ? '${description.substring(0, 18)}...' : description;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       decoration: BoxDecoration(
@@ -103,16 +114,14 @@ class KurikulumEditPage extends StatelessWidget {
                 color: Color.fromARGB(255, 97, 97, 97),
               ),
             ),
-            subtitle: Text(description),
+            subtitle: Text(shortDescription), // Menampilkan deskripsi yang dipotong
             trailing: IconButton(
-              icon: const Icon(Icons.edit,
-                  color: Color.fromARGB(255, 96, 183, 99)),
+              icon: const Icon(Icons.edit, color: Color.fromARGB(255, 96, 183, 99)),
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditKurikulumDetailPage(
-                        title: title, description: description),
+                    builder: (context) => EditKurikulumDetailPage(title: title, description: description),
                   ),
                 );
               },

@@ -65,7 +65,9 @@ class EditKurikulumDetailPageState extends State<EditKurikulumDetailPage> {
                 labelText: widget.title,
                 border: const OutlineInputBorder(),
               ),
-              maxLines: 5,
+              maxLines: 15, // Meningkatkan jumlah baris untuk menampung lebih banyak teks
+              keyboardType: TextInputType.multiline, // Memungkinkan penulisan baris baru
+              textInputAction: TextInputAction.newline, // Membuka baris baru saat tombol enter ditekan
             ),
             const SizedBox(height: 16.0),
             ElevatedButton(
